@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ChallengesStore</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_user_edit">UserEditActivity</string>
+</resources>
