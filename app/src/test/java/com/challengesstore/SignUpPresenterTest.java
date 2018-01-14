@@ -70,6 +70,7 @@ public class SignUpPresenterTest {
                 .thenReturn(rxRule.getErrorObservable(412,"User already exists"));
 
         presenter.signUp(getNotValidTestUser());
+
         verify(view).setButtonEnabled(true);
     }
 
@@ -78,10 +79,10 @@ public class SignUpPresenterTest {
     public void onValidData_Test() {
 
         // doesn't word TODO : delete
-        when(Patterns.EMAIL_ADDRESS.matcher(anyString()).matches()).thenReturn(true);
+//        when(Patterns.EMAIL_ADDRESS.matcher(anyString()).matches()).thenReturn(true);
 
         assertTrue(presenter.isUserDataValid(getTestUser()));
-        verify(view).showValidFieldError(new UserSignUp(null,null,null,null,null));
+        verify(view).showValidFieldError(new UserSignUp(null,null,null,null,null,null));
     }
 
 
@@ -89,7 +90,7 @@ public class SignUpPresenterTest {
     @Test
     public void onNotValidData_Test() {
         assertFalse(presenter.isUserDataValid(getNotValidTestUser()));
-        verify(view).showValidFieldError(new UserSignUp(null,null,"enter a valid email address",
+        verify(view).showValidFieldError(new UserSignUp(null,null,null,"enter a valid email address",
                 null,"passwords doesn't match"));
 
     }
@@ -108,6 +109,7 @@ public class SignUpPresenterTest {
         presenter.sendUserData(getTestUser());
 
         verify(view).onResponseSuccess();
+
     }
 
     // Test error response from server
@@ -142,13 +144,13 @@ public class SignUpPresenterTest {
     // Stub properly user
     @NonNull
     private UserSignUp getTestUser() {
-        return new UserSignUp("Linus","Torvalds","gnu_linux_best_os_ever@mail.ru","asda2","asda2");
+        return new UserSignUp("Linus","Torvalds","Linux","gnu_linux_best_os_ever@mail.ru","asda2","asda2");
     }
 
     // Stub improperly user
     @NonNull
     private UserSignUp getNotValidTestUser() {
-        return new UserSignUp("aa","zs","","pass","pass_not_same");
+        return new UserSignUp("aa","zs","as","","pass","pass_not_same");
     }
 
 }

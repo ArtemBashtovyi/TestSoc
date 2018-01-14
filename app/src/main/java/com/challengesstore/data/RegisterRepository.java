@@ -4,6 +4,7 @@ import com.challengesstore.data.api.register.ApiFactory;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
 
 /**
@@ -20,4 +21,7 @@ public class RegisterRepository {
         return ApiFactory.getRegisterService().login(userData);
     }
 
+    public Call<ResponseBody> welcome() {
+        return ApiFactory.getUserService().welcome();
+    }
 }

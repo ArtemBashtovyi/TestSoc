@@ -2,7 +2,6 @@ package com.challengesstore.register;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -31,13 +30,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
 
+
     @Rule
     public ActivityTestRule<SignUpActivity> rule = new ActivityTestRule<>(SignUpActivity.class, true, true);
 
     @Before
     public void fillingBaseData() {
-        onView(ViewMatchers.withId(R.id.input_name)).perform(ViewActions.typeText("Artem"));
+
+        onView(withId(R.id.input_name)).perform(ViewActions.typeText("Artem"));
         onView(withId(R.id.input_surname)).perform(ViewActions.typeText("Bash"), closeSoftKeyboard());
+        onView(withId(R.id.input_user_name)).perform(ViewActions.typeText("ArtemQQ"), closeSoftKeyboard());
         onView(withId(R.id.input_email)).perform(ViewActions.typeText("artem@gmail.com"), closeSoftKeyboard());
         onView(withId(R.id.input_password)).perform(ViewActions.typeText("pass"), closeSoftKeyboard());
         onView(withId(R.id.input_password_repeat)).perform(ViewActions.typeText("pass"), closeSoftKeyboard());
@@ -53,11 +55,13 @@ public class SignUpActivityTest {
 
         onView(withId(R.id.input_name)).check(matches(withText("Artem")));
         onView(withId(R.id.input_surname)).check(matches(withText("Bash")));
+        onView(withId(R.id.input_user_name)).check(matches(withText("ArtemQQ")));
         onView(withId(R.id.input_email)).check(matches(withText("artem@gmail.com")));
         onView(withId(R.id.input_password)).check(matches(withText("pass")));
         onView(withId(R.id.input_password_repeat)).check(matches(withText("pass")));
 
-        onView(withId(R.id.link_login)).perform(click());
+        onView(withId(R.id.btn_signup)).perform(click());
+
 
     }
 

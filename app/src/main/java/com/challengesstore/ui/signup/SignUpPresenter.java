@@ -1,7 +1,12 @@
 package com.challengesstore.ui.signup;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.challengesstore.data.RegisterRepository;
 import com.challengesstore.data.model.registration.UserSignUp;
+import com.challengesstore.data.model.registration.error.DataValidationError;
+import com.challengesstore.data.model.registration.error.InvalidFields;
 import com.google.gson.Gson;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -31,11 +36,12 @@ public class SignUpPresenter {
 
     // main method which start sequence
     public void signUp(UserSignUp userData) {
+
         // check data validation
-        if (!isUserDataValid(userData)) {
+        /*if (!isUserDataValid(userData)) {
             view.setButtonEnabled(true);
             return;
-        }
+        }*/
 
         // if data valid send data to server
         view.setButtonEnabled(false);
@@ -55,12 +61,11 @@ public class SignUpPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (!response.isSuccessful()) {
-
-                        view.onResponseError(response.errorBody().string() );
-
+                        setErrorFields(response.code(), String.valueOf(response.errorBody()));
                         return;
                     }
                     view.onResponseSuccess();
+                    Log.i("Response ", response.body().string());
                         } ,e -> view.onResponseError("Error internet connection")
                 )
         );
@@ -68,15 +73,22 @@ public class SignUpPresenter {
 
     // logic to verify is user input data valid
     public boolean isUserDataValid(UserSignUp user) {
+
         boolean isValid = true;
         String name = null;
         String surname = null;
+        String userName = null;
         String password = null;
         String passwordRepeat = null;
         String email = null;
 
         if (user.getName().isEmpty() || user.getName().length() < 1) {
             name = "at least 1 character";
+            isValid = false;
+        }
+
+        if (user.getUserName().isEmpty() || user.getUserName().length() < 1) {
+            userName = "at least 1 character";
             isValid = false;
         }
 
@@ -102,15 +114,26 @@ public class SignUpPresenter {
         }
 
         // if all clauses have verified then send null,null...
-        view.showValidFieldError(new UserSignUp(name,surname,email,password,passwordRepeat));
+        view.showValidFieldError(new UserSignUp(name,surname,userName,email,password,passwordRepeat));
         return isValid;
     }
 
 
-    void setError(int code){
-        if (code == 401) {
-            // email has used already
+    public void setErrorFields(int code,@NonNull String errorJson){
+        if (code == 400) {
+            try {
+                Gson gson = new Gson();
+                InvalidFields invalidFields = gson.fromJson(errorJson, DataValidationError.class)
+                        .getInvalidFields();
+
+            } catch (Exception e) {
+                view.onResponseError("Input data invalid");
+            }
+
+        } else {
+            view.onResponseError("Unknown error");
         }
+
         // TODO : HANDLE code and SHOW CERTAIN ERROR FOR EDIT TEXT WHEN RESPONSE OF NOT VALID DATA -> FROM SERVER
     }
 

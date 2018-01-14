@@ -14,7 +14,7 @@ android {
 
 
         buildConfigField "String", "API_KEY", '"$2y$10$pn0UhyWG0lrIvv8QGQNysupcFmUB3AcO4OW95POJQxSvJSec3Yy8u"'
-        buildConfigField "String", "API_ENDPOINT", '"http://192.168.0.31:8000/api/"'
+        buildConfigField "String", "API_ENDPOINT", '"http://192.168.1.192:8000/api/"'
 
     }
     buildTypes {

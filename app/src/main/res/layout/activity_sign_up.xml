@@ -11,32 +11,40 @@
         android:id="@+id/signup_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="56dp"
+        android:paddingTop="6dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
         <ImageView
-            android:src="@mipmap/ic_launcher"
+            android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="72dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:layout_gravity="center_horizontal" />
-
-        <!--  Name Label -->
-        <EditText
-            android:id="@+id/input_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name"
-            android:inputType="textCapWords" />
+            android:src="@mipmap/ic_launcher" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
+            <!--  Name Label -->
+            <EditText
+                android:id="@+id/input_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name"
+                android:inputType="textCapWords" />
+
+
 
         </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
         <!--  Surname Label -->
         <EditText
@@ -45,6 +53,22 @@
             android:layout_height="wrap_content"
             android:hint="Surname"
             android:inputType="textCapWords" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- UserName Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText android:id="@+id/input_user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:hint="UserName"/>
+        </android.support.design.widget.TextInputLayout>
 
         <!-- Email Label -->
         <android.support.design.widget.TextInputLayout
@@ -97,7 +121,8 @@
             android:text="Create Account"/>
 
 
-        <TextView android:id="@+id/link_login"
+        <TextView
+            android:id="@+id/link_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"

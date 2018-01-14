@@ -84,7 +84,6 @@ public class SignInPresenterTest {
 
         presenter.sendUserData(getValidSignInUser());
 
-
         verify(view).onResponseSuccess(FAKE_API_USER);
 
     }

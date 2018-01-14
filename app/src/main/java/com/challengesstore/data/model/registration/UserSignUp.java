@@ -1,14 +1,26 @@
 package com.challengesstore.data.model.registration;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserSignUp {
 
+    @SerializedName("first_name")
     private String name;
 
+    @SerializedName("last_name")
     private String surname;
 
+    @SerializedName("username")
+    private String userName;
+
+    @SerializedName("check_terms")
+    private boolean checkTerms;
+
+    @SerializedName("email")
     private String email;
 
+    @SerializedName("plainPassword")
     private String password;
 
     private transient String passwordRepeat;
@@ -21,14 +33,17 @@ public class UserSignUp {
         this.surname = surname;
         this.email = email;
         this.password = password;
+
     }
 
-    public UserSignUp(String name, String surname, String email, String password, String passwordRepeat) {
+    public UserSignUp(String name, String surname,String userName, String email, String password, String passwordRepeat) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
         this.passwordRepeat = passwordRepeat;
+        this.userName = userName;
+        this.checkTerms = true;
     }
 
     public String getName() {
@@ -71,27 +86,46 @@ public class UserSignUp {
         this.passwordRepeat = passwordRepeat;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public boolean isCheckTerms() {
+        return checkTerms;
+    }
+
+    public void setCheckTerms(boolean checkTerms) {
+        this.checkTerms = checkTerms;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserSignUp signUp = (UserSignUp) o;
+        UserSignUp that = (UserSignUp) o;
 
-        if (name != null ? !name.equals(signUp.name) : signUp.name != null) return false;
-        if (surname != null ? !surname.equals(signUp.surname) : signUp.surname != null)
+        if (checkTerms != that.checkTerms) return false;
+        if (userName != null ? !userName.equals(that.userName) : that.userName != null)
             return false;
-        if (email != null ? !email.equals(signUp.email) : signUp.email != null) return false;
-        if (password != null ? !password.equals(signUp.password) : signUp.password != null)
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        if (password != null ? !password.equals(that.password) : that.password != null)
             return false;
-        return passwordRepeat != null ? passwordRepeat.equals(signUp.passwordRepeat) : signUp.passwordRepeat == null;
+        return passwordRepeat != null ? passwordRepeat.equals(that.passwordRepeat) : that.passwordRepeat == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
+        int result = userName != null ? userName.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (checkTerms ? 1 : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
@@ -102,7 +136,9 @@ public class UserSignUp {
     @Override
     public String toString() {
         return "UserSignUp{" +
-                "name='" + name + '\'' +
+                "userName='" + userName + '\'' +
+                ", name='" + name + '\'' +
+                ", checkTerms=" + checkTerms +
                 ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +

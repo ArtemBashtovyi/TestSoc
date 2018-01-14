@@ -15,6 +15,7 @@ import com.challengesstore.data.api.register.ApiFactory;
 import com.challengesstore.data.api.service.UserService;
 
 import java.io.File;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +31,6 @@ import retrofit2.Response;
 public class UserEditActivity extends Activity {
 
     private static final int PICK_IMAGE = 100;
-    private static final String API_KEY = "PUT YOUR API_KEY";
 
     @BindView(R.id.button)
     Button button;
@@ -40,6 +40,8 @@ public class UserEditActivity extends Activity {
         Intent intent = new Intent(context,UserEditActivity.class);
         context.startActivity(intent);
     }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,6 @@ public class UserEditActivity extends Activity {
                 startActivityForResult(i, PICK_IMAGE);
             });
         }
-
 
     }
 
@@ -86,18 +87,23 @@ public class UserEditActivity extends Activity {
             File file = new File(filePath);
 
             RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
-            RequestBody name = RequestBody.create(MediaType.parse("text/plain"), API_KEY);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(), reqFile);
+            RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "Art");
+            RequestBody lastName = RequestBody.create(MediaType.parse("text/plain"), "Art");
 
             Log.d("THIS", data.getData().getPath());
 
             UserService registerService = ApiFactory.getUserService();
-            Call<ResponseBody> req = registerService.postImage(body, name);
+            Call<ResponseBody> req = registerService.postImage(body, name,lastName);
 
             req.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
+                    try {
+                        Log.i("ResponseImage",response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override

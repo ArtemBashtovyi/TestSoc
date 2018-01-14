@@ -12,10 +12,10 @@ import retrofit2.http.POST;
 
 public interface RegisterService {
 
-    @POST("user/signUp")
+    @POST("user/sign_up")
     Observable<Response<ResponseBody>> create(@Body String json);
 
-    @POST("user/signIn")
+    @POST("user/login")
     Observable<Response<ResponseBody>> login(@Body String userData);
 
 

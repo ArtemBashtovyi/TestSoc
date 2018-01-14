@@ -11,7 +11,8 @@ import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.challengesstore.MainActivity;
+import com.arellomobile.mvp.presenter.PresenterType;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.challengesstore.R;
 import com.challengesstore.data.RegisterRepository;
 import com.challengesstore.data.model.registration.UserSignIn;
@@ -36,7 +37,7 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
     @BindView(R.id.link_signup)
     TextView linkSignUpTv;
 
-    @InjectPresenter
+    @InjectPresenter(type = PresenterType.LOCAL)
     LoginPresenter presenter;
 
     public static void start(Context context) {
@@ -50,15 +51,34 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        RegisterRepository repository = new RegisterRepository();
-        presenter = new LoginPresenter(repository);
+        signInBn.setOnClickListener(view ->{
+                    /*RegisterRepository registerRepository = new RegisterRepository();
+                    Call<ResponseBody> responseBodyCall  = registerRepository.welcome();
+                    responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            try {
+                                Log.i("Response",response.body().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-        signInBn.setOnClickListener(view -> presenter.onButtonSignInClick());
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                        }
+                    });*/
+            presenter.onButtonSignInClick();
+        });
 
         linkSignUpTv.setOnClickListener(view -> SignUpActivity.start(this));
     }
 
-
+    @ProvidePresenter(type = PresenterType.LOCAL)
+    LoginPresenter provideDetailPresenter() {
+        return new LoginPresenter(new RegisterRepository());
+    }
 
     @Override
     public void signIn() {
@@ -84,16 +104,20 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
 
     @Override
     public void onResponseError(String errorText) {
-        Toast.makeText(getBaseContext(), errorText, Toast.LENGTH_LONG).show();
-        signInBn.setEnabled(true);
+        if (errorText != null) {
+            Toast.makeText(getBaseContext(), errorText, Toast.LENGTH_LONG).show();
+            signInBn.setEnabled(true);
+        }
     }
 
     @Override
     public void onResponseSuccess(String response) {
-        // TODO : caching unique USER_API_KEY
         Toast.makeText(getBaseContext(), "Login success", Toast.LENGTH_LONG).show();
-        MainActivity.start(this,response);
+
+       // MainActivity.start(this,response);
+
+        Log.i("Response",response);
         signInBn.setEnabled(true);
-        finish();
+        //finish();
     }
 }

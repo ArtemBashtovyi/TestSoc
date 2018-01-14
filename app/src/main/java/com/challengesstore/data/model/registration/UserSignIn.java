@@ -1,9 +1,13 @@
 package com.challengesstore.data.model.registration;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserSignIn {
 
+    @SerializedName("user")
     private String email;
+
     private String password;
 
     public UserSignIn(String email, String password) {

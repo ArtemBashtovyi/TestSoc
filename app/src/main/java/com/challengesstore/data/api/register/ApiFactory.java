@@ -3,6 +3,7 @@ package com.challengesstore.data.api.register;
 import android.support.annotation.NonNull;
 
 import com.challengesstore.BuildConfig;
+import com.challengesstore.data.api.interceptor.UserTokenInterceptor;
 import com.challengesstore.data.api.service.RegisterService;
 import com.challengesstore.data.api.service.UserService;
 
@@ -20,17 +21,21 @@ public class ApiFactory {
     private static RegisterService registerService;
     private static UserService userService;
 
-    private static OkHttpClient okHttpClient;
+    private static OkHttpClient registerClient;
 
 
     public static UserService getUserService() {
         if (userService == null) {
             synchronized (ApiFactory.class) {
                 if (userService == null) {
-                    userService = createService().create(UserService.class);
+                    userService = createServiceBuilder()
+                            .client(createUserClient())
+                            .build()
+                            .create(UserService.class);
                 }
             }
         }
+
         return userService;
     }
 
@@ -39,7 +44,10 @@ public class ApiFactory {
         if (registerService == null) {
             synchronized (ApiFactory.class) {
                 if (registerService == null) {
-                    registerService = createService().create(RegisterService.class);
+                    registerService = createServiceBuilder()
+                            .client(createRegisterClient())
+                            .build()
+                            .create(RegisterService.class);
                 }
             }
         }
@@ -48,36 +56,49 @@ public class ApiFactory {
 
 
     @NonNull
-    private static Retrofit createService() {
+    private static Retrofit.Builder createServiceBuilder() {
         return new Retrofit.Builder()
-                .client(buildClient())
+                /*.client(buildClient())*/
                 .baseUrl(BuildConfig.API_ENDPOINT)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
     }
 
 
 
-    // Двойная проверка
-    private static OkHttpClient buildClient() {
-        if (okHttpClient == null) {
+
+    private static OkHttpClient createUserClient() {
+        if (registerClient == null) {
             synchronized (ApiFactory.class) {
-                if (okHttpClient == null) {
-                    okHttpClient = createClient();
+                if (registerClient == null) {
+                    registerClient = createBuilder()
+                            .addInterceptor(new UserTokenInterceptor())
+                            .build();
                 }
             }
         }
-        return okHttpClient;
+        return registerClient;
+    }
+
+    // Двойная проверка
+    private static OkHttpClient createRegisterClient() {
+        if (registerClient == null) {
+            synchronized (ApiFactory.class) {
+                if (registerClient == null) {
+                    registerClient = createBuilder().build();
+                }
+            }
+        }
+        return registerClient;
     }
 
     @NonNull
-    private static OkHttpClient createClient() {
+    private static OkHttpClient.Builder createBuilder() {
         return new OkHttpClient.Builder()
+                .addInterceptor(createLogInterceptor())
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15,TimeUnit.SECONDS)
-                .addInterceptor(createLogInterceptor())
-                .build();
+                .addInterceptor(createLogInterceptor());
     }
 
 

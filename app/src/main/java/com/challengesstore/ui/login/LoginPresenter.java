@@ -1,5 +1,7 @@
 package com.challengesstore.ui.login;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.challengesstore.data.RegisterRepository;
@@ -10,9 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by felix on 1/9/18
- */
+
 @InjectViewState
 public class LoginPresenter extends MvpPresenter<LoginView> {
 
@@ -30,8 +30,8 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
         getViewState().signIn();
     }
 
-
     public void signIn(final UserSignIn userData) {
+
         if (!isUserDataValid(userData)) {
             getViewState().setButtonEnabled(true);
             return;
@@ -56,9 +56,10 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
                         getViewState().onResponseError(responseBody.errorBody().string());
                         return;
                     }
-                    // TODO : Check handling json with API USER KEY -> FROM SERVER
 
+                    // TODO : Check handling json with API USER KEY -> FROM SERVER
                     getViewState().onResponseSuccess(responseBody.body().string());
+                    Log.i("ResponseFull", responseBody.message());
 
                 }, e -> getViewState().onResponseError("Error internet connection")));
     }

@@ -34,6 +34,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
     @BindView(R.id.input_password)
     EditText passwordEt;
 
+    @BindView(R.id.input_user_name)
+    EditText userNameEt;
+
     @BindView(R.id.input_password_repeat)
     EditText passwordRepeatEt;
 
@@ -71,13 +74,15 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
     public void onResponseSuccess() {
         Toast.makeText(getBaseContext(), "Login success", Toast.LENGTH_LONG).show();
         signUpBn.setEnabled(true);
-        LoginActivity.start(this);
-        finish();
+
+        /*LoginActivity.start(this);
+        finish();*/
     }
 
     @Override
     public void onResponseError(String errorText) {
         Toast.makeText(getBaseContext(), errorText, Toast.LENGTH_LONG).show();
+        Log.e("ErrorResponse-",errorText);
         signUpBn.setEnabled(true);
     }
 
@@ -86,12 +91,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
     public void signUp() {
         String name = nameEt.getText().toString();
         String surname = surnameEt.getText().toString();
+        String userName = userNameEt.getText().toString();
         String email = emailEt.getText().toString();
         String password = passwordEt.getText().toString();
         String passwordRepeat = passwordRepeatEt.getText().toString();
 
-        UserSignUp userData = new UserSignUp(name,surname,email,password,passwordRepeat);
-
+        UserSignUp userData = new UserSignUp(name,surname,userName,email,password,passwordRepeat);
         presenter.signUp(userData);
 
         Log.i(TAG,userData.toString());
