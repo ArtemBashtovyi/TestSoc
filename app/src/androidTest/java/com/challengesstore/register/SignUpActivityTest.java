@@ -81,6 +81,11 @@ public class SignUpActivityTest {
         onView(withId(R.id.input_email)).check(matches(hasErrorText("enter a valid email address")));
         onView(withId(R.id.input_password_repeat)).check(matches(hasErrorText("passwords doesn't match")));
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

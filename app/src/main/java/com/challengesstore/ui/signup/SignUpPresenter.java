@@ -1,12 +1,11 @@
 package com.challengesstore.ui.signup;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignUp;
-import com.challengesstore.data.model.registration.error.DataValidationError;
-import com.challengesstore.data.model.registration.error.InvalidFields;
+import com.challengesstore.data.model.register.UserSignUp;
+import com.challengesstore.data.model.register.error.DataValidationError;
+import com.challengesstore.data.repository.RegisterRepository;
 import com.google.gson.Gson;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -19,6 +18,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SignUpPresenter {
 
+    private static final int ERROR_BAD_REQUEST_CODE = 400;
+
     private SignUpView view;
     private RegisterRepository repository;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -29,8 +30,7 @@ public class SignUpPresenter {
         this.repository = registerRepository;
     }
 
-
-    public void onClick() {
+    void onClick() {
         view.signUp();
     }
 
@@ -38,10 +38,10 @@ public class SignUpPresenter {
     public void signUp(UserSignUp userData) {
 
         // check data validation
-        /*if (!isUserDataValid(userData)) {
+        if (!isUserDataValid(userData)) {
             view.setButtonEnabled(true);
             return;
-        }*/
+        }
 
         // if data valid send data to server
         view.setButtonEnabled(false);
@@ -50,29 +50,31 @@ public class SignUpPresenter {
 
 
     // send POST to server
-    public void sendUserData(UserSignUp user) {
 
+    private void sendUserData(UserSignUp user) {
         final String json = new Gson().toJson(user);
 
         disposable.clear();
+
         disposable.add(repository
                 .signUp(json)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (!response.isSuccessful()) {
-                        setErrorFields(response.code(), String.valueOf(response.errorBody()));
+
+                        onResponseError(response.code(),response.errorBody().string());
                         return;
                     }
                     view.onResponseSuccess();
-                    Log.i("Response ", response.body().string());
+                    Log.i("Response ", String.valueOf(response.body().string()));
                         } ,e -> view.onResponseError("Error internet connection")
                 )
         );
     }
 
     // logic to verify is user input data valid
-    public boolean isUserDataValid(UserSignUp user) {
+    private boolean isUserDataValid(UserSignUp user) {
 
         boolean isValid = true;
         String name = null;
@@ -88,7 +90,7 @@ public class SignUpPresenter {
         }
 
         if (user.getUserName().isEmpty() || user.getUserName().length() < 1) {
-            userName = "at least 1 character";
+            userName = "this user name already exists";
             isValid = false;
         }
 
@@ -97,7 +99,7 @@ public class SignUpPresenter {
             isValid = false;
         }
 
-        if (user.getEmail() == null || user.getEmail().isEmpty()
+        if (user.getEmail().isEmpty() || user.getEmail().isEmpty()
                 /*|| !android.util.Patterns.EMAIL_ADDRESS.matcher(user.getEmail()).matches()*/) {
             email = "enter a valid email address";
             isValid = false;
@@ -119,22 +121,24 @@ public class SignUpPresenter {
     }
 
 
-    public void setErrorFields(int code,@NonNull String errorJson){
-        if (code == 400) {
-            try {
-                Gson gson = new Gson();
-                InvalidFields invalidFields = gson.fromJson(errorJson, DataValidationError.class)
-                        .getInvalidFields();
+     private void onResponseError(int code,@Nullable String errorJson){
+        if (errorJson != null) {
+            if (code == ERROR_BAD_REQUEST_CODE) {
+                try {
+                    UserSignUp invalidFields = new Gson()
+                            .fromJson(errorJson, DataValidationError.class)
+                            .getUserSignUp();
 
-            } catch (Exception e) {
-                view.onResponseError("Input data invalid");
+                    view.showValidFieldError(invalidFields);
+
+                } catch (Exception e) {
+                    view.onResponseError("Input data invalid");
+                }
+
+            } else {
+                view.onResponseError("Unknown error");
             }
-
-        } else {
-            view.onResponseError("Unknown error");
-        }
-
-        // TODO : HANDLE code and SHOW CERTAIN ERROR FOR EDIT TEXT WHEN RESPONSE OF NOT VALID DATA -> FROM SERVER
+        } else view.onResponseError("Error");
     }
 
     void onDestroy() {

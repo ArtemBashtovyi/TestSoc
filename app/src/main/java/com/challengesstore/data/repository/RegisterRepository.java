@@ -1,10 +1,10 @@
-package com.challengesstore.data;
+package com.challengesstore.data.repository;
 
-import com.challengesstore.data.api.register.ApiFactory;
+import com.challengesstore.data.api.ApiFactory;
+import com.challengesstore.data.model.register.response.AuthResponse;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
 import retrofit2.Response;
 
 /**
@@ -17,11 +17,8 @@ public class RegisterRepository {
         return ApiFactory.getRegisterService().create(json);
     }
 
-    public Observable<Response<ResponseBody>> signIn(String userData) {
+    public Observable<Response<AuthResponse>> signIn(String userData) {
         return ApiFactory.getRegisterService().login(userData);
     }
 
-    public Call<ResponseBody> welcome() {
-        return ApiFactory.getUserService().welcome();
-    }
 }

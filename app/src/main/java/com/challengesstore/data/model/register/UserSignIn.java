@@ -1,4 +1,4 @@
-package com.challengesstore.data.model.registration;
+package com.challengesstore.data.model.register;
 
 
 import com.google.gson.annotations.SerializedName;

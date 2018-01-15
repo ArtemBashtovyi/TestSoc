@@ -11,7 +11,7 @@ import android.util.Log;
 import android.widget.Button;
 
 import com.challengesstore.R;
-import com.challengesstore.data.api.register.ApiFactory;
+import com.challengesstore.data.api.ApiFactory;
 import com.challengesstore.data.api.service.UserService;
 
 import java.io.File;
@@ -49,12 +49,21 @@ public class UserEditActivity extends Activity {
         ButterKnife.bind(this);
         if (button != null) {
             button.setOnClickListener(view -> {
+
+                Call<ResponseBody> call = ApiFactory.getUserService(getApplicationContext()).welcome();
+                try {
+                    Response<ResponseBody> responseBody = call.execute();
+                    Log.i("Call in activity",responseBody.body().string());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 /*Intent intent = new Intent(this,);
-                intent.setType("image*//*");
+                intent.setType("image*//**//*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE);*/
+                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE);*//*
                 Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, PICK_IMAGE);
+                startActivityForResult(i, PICK_IMAGE);*/
             });
         }
 
@@ -93,7 +102,7 @@ public class UserEditActivity extends Activity {
 
             Log.d("THIS", data.getData().getPath());
 
-            UserService registerService = ApiFactory.getUserService();
+            UserService registerService = ApiFactory.getUserService(getApplicationContext());
             Call<ResponseBody> req = registerService.postImage(body, name,lastName);
 
             req.enqueue(new Callback<ResponseBody>() {

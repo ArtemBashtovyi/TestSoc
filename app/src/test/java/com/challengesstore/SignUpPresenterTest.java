@@ -3,8 +3,9 @@ package com.challengesstore;
 import android.support.annotation.NonNull;
 import android.util.Patterns;
 
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignUp;
+import com.challengesstore.data.repository.RegisterRepository;
+import com.challengesstore.data.model.register.UserSignUp;
+import com.challengesstore.data.model.register.error.DataValidationError;
 import com.challengesstore.ui.signup.SignUpPresenter;
 import com.challengesstore.ui.signup.SignUpView;
 import com.google.gson.Gson;
@@ -17,7 +18,6 @@ import org.mockito.MockitoAnnotations;
 
 import okhttp3.ResponseBody;
 
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
  */
 
 public class SignUpPresenterTest {
+
+    private static final String NOT_VALID_RESPONSE = "{ \"errors\":{ \"username\":\"Error\", \"email\":\"email already used\" } }";
 
     @Mock
     SignUpView view;
@@ -41,7 +43,7 @@ public class SignUpPresenterTest {
     @Mock
     Patterns patterns;
 
-    SignUpPresenter presenter;
+    private SignUpPresenter presenter;
 
     @Before
     public void init() {
@@ -50,48 +52,17 @@ public class SignUpPresenterTest {
     }
 
 
+    // Test for deserialization if in modelPojo more field then in json
     @Test
-    public void singUpCorrect_Test() {
+    public void deserializationUserSignUp_Test(){
 
-        when(registerRepository.signUp(anyString())).thenReturn(rxRule.
-                getSuccessObservable(getSuccessResponseBody()));
+        DataValidationError error;
 
-        presenter.signUp(getTestUser());
+        Gson gson = new Gson();
+        error = gson.fromJson(NOT_VALID_RESPONSE,DataValidationError.class);
+        System.out.println(error.getUserSignUp().toString());
 
-        verify(view).setButtonEnabled(false);
-        verify(view).onResponseSuccess();
-
-    }
-
-    @Test
-    public void singUpUnCorrect_Test() {
-
-        when(registerRepository.signUp(anyString()))
-                .thenReturn(rxRule.getErrorObservable(412,"User already exists"));
-
-        presenter.signUp(getNotValidTestUser());
-
-        verify(view).setButtonEnabled(true);
-    }
-
-    // verify showing error when data valid
-    @Test
-    public void onValidData_Test() {
-
-        // doesn't word TODO : delete
-//        when(Patterns.EMAIL_ADDRESS.matcher(anyString()).matches()).thenReturn(true);
-
-        assertTrue(presenter.isUserDataValid(getTestUser()));
-        verify(view).showValidFieldError(new UserSignUp(null,null,null,null,null,null));
-    }
-
-
-    // verify showing error when data not valid
-    @Test
-    public void onNotValidData_Test() {
-        assertFalse(presenter.isUserDataValid(getNotValidTestUser()));
-        verify(view).showValidFieldError(new UserSignUp(null,null,null,"enter a valid email address",
-                null,"passwords doesn't match"));
+        assertTrue(error.getUserSignUp().equals(new UserSignUp(null,null,"Error","email already used",null,null)));
 
     }
 
@@ -106,7 +77,7 @@ public class SignUpPresenterTest {
         when(registerRepository.signUp(json))
                 .thenReturn(rxRule.getSuccessObservable(getSuccessResponseBody()));
 
-        presenter.sendUserData(getTestUser());
+        presenter.signUp(getTestUser());
 
         verify(view).onResponseSuccess();
 
@@ -115,22 +86,21 @@ public class SignUpPresenterTest {
     // Test error response from server
     @Test
     public void onErrorResponse_Test() {
-        String errorTest = "User already exists!";
 
-        // replaced by rxRule method
-        /*Response<ResponseBody> response = Response.error(404,ResponseBody.create(null,errorTest));
-        Observable<Response<ResponseBody>> observable = Observable.just(response);*/
+
 
         when(registerRepository.signUp(anyString()))
-                .thenReturn(rxRule.getErrorObservable(408,errorTest));
+                .thenReturn(rxRule.getErrorObservable(400,NOT_VALID_RESPONSE));
 
-        presenter.sendUserData(getTestUser());
-        verify(view).onResponseError(errorTest);
+        System.out.println();
+        presenter.signUp(getTestUser());
 
-        assertTrue("error body from server - " + errorTest,true);
+        verify(view).setButtonEnabled(false);
+        verify(view).showValidFieldError(new UserSignUp(null,null,"Error","email already used",null));
+
+        System.out.println(NOT_VALID_RESPONSE);
 
     }
-
 
 
     ///////////////////////////////////////////////////////***STUBS***//////////////////////////////////////////////
@@ -147,10 +117,5 @@ public class SignUpPresenterTest {
         return new UserSignUp("Linus","Torvalds","Linux","gnu_linux_best_os_ever@mail.ru","asda2","asda2");
     }
 
-    // Stub improperly user
-    @NonNull
-    private UserSignUp getNotValidTestUser() {
-        return new UserSignUp("aa","zs","as","","pass","pass_not_same");
-    }
 
 }

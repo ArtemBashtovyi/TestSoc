@@ -2,8 +2,8 @@ package com.challengesstore;
 
 import android.support.annotation.NonNull;
 
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignIn;
+import com.challengesstore.data.repository.RegisterRepository;
+import com.challengesstore.data.model.register.UserSignIn;
 import com.challengesstore.ui.login.LoginPresenter;
 import com.challengesstore.ui.login.LoginView$$State;
 import com.google.gson.Gson;
@@ -26,10 +26,9 @@ import static org.mockito.Mockito.when;
 /**
  * Created by felix on 1/10/18
  */
-
+// TODO : REWRITE THIS BULL-SHIT
 public class SignInPresenterTest {
 
-    // image that here md5 code
     public static final String FAKE_API_USER = "USER_ARTEM@51151";
 
     @Mock
@@ -38,7 +37,7 @@ public class SignInPresenterTest {
     @Mock
     LoginView$$State view;
 
-    LoginPresenter presenter;
+    private LoginPresenter presenter;
 
     @Rule
     public SchedulerRxRule schedulerRxRule = new SchedulerRxRule();
@@ -122,7 +121,6 @@ public class SignInPresenterTest {
     private ResponseBody getSuccessResponseBody() {
         return ResponseBody.create(null,FAKE_API_USER);
     }
-
 
     // STUBS
     @NonNull

@@ -11,8 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.challengesstore.R;
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignUp;
+import com.challengesstore.data.repository.RegisterRepository;
+import com.challengesstore.data.model.register.UserSignUp;
 import com.challengesstore.ui.login.LoginActivity;
 
 import butterknife.BindView;
@@ -105,10 +105,16 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
 
 
     // show error in each EditText if improperly data introduced
+    /*@Override
+    public void showValidFieldError(@Nullable String name, @Nullable String surname,
+                                    @Nullable String email, @Nullable String password,
+                                    @Nullable  String passwordRepeat){*/
+
     @Override
     public void showValidFieldError(UserSignUp userData) {
         nameEt.setError(userData.getName());
         surnameEt.setError(userData.getSurname());
+        userNameEt.setError(userData.getUserName());
         emailEt.setError(userData.getEmail());
         passwordEt.setError(userData.getPassword());
         passwordRepeatEt.setError(userData.getPasswordRepeat());

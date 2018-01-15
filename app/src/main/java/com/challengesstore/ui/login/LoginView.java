@@ -1,7 +1,9 @@
 package com.challengesstore.ui.login;
 
+import android.support.annotation.NonNull;
+
 import com.arellomobile.mvp.MvpView;
-import com.challengesstore.data.model.registration.UserSignIn;
+import com.challengesstore.data.model.register.UserSignIn;
 
 /**
  * Created by felix on 1/9/18
@@ -9,9 +11,9 @@ import com.challengesstore.data.model.registration.UserSignIn;
 
 public interface LoginView extends MvpView {
 
-    void onResponseError(String errorText);
+    void onResponseError(@NonNull String errorText);
 
-    void onResponseSuccess(String response);
+    void onResponseSuccess();
 
     void signIn();
 

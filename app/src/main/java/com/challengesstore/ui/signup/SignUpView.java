@@ -1,6 +1,6 @@
 package com.challengesstore.ui.signup;
 
-import com.challengesstore.data.model.registration.UserSignUp;
+import com.challengesstore.data.model.register.UserSignUp;
 
 /**
  * Created by felix on 1/7/18
@@ -14,7 +14,7 @@ public interface SignUpView {
 
     void signUp();
 
-    void showValidFieldError(UserSignUp userData);
+    void showValidFieldError(UserSignUp user);
 
     void setButtonEnabled(boolean isEnabled);
 }

@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignIn;
+import com.challengesstore.data.model.register.UserSignIn;
+import com.challengesstore.data.model.register.response.AuthResponse;
+import com.challengesstore.data.repository.AuthRepository;
+import com.challengesstore.data.repository.RegisterRepository;
 import com.google.gson.Gson;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -17,13 +19,16 @@ import io.reactivex.schedulers.Schedulers;
 public class LoginPresenter extends MvpPresenter<LoginView> {
 
     private RegisterRepository repository;
+    private AuthRepository authRepository;
+
     private CompositeDisposable disposable = new CompositeDisposable();
 
     public LoginPresenter() {
     }
 
-    public LoginPresenter(RegisterRepository repository) {
+    public LoginPresenter(RegisterRepository repository,AuthRepository authRepository) {
         this.repository = repository;
+        this.authRepository = authRepository;
     }
 
     void onButtonSignInClick(){
@@ -57,9 +62,8 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
                         return;
                     }
 
-                    // TODO : Check handling json with API USER KEY -> FROM SERVER
-                    getViewState().onResponseSuccess(responseBody.body().string());
-                    Log.i("ResponseFull", responseBody.message());
+                    onResponseSuccess(responseBody.body());
+                    Log.i("ResponseFull", responseBody.body().getAccessToken());
 
                 }, e -> getViewState().onResponseError("Error internet connection")));
     }
@@ -91,6 +95,20 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
         return isValid;
     }
 
+
+    private void onResponseSuccess(AuthResponse authResponse) {
+
+        if (!authResponse.getAccessToken().isEmpty() && !authResponse.getRefreshToken().isEmpty()) {
+
+            Log.i("Tokens","Tokens are successfully created");
+
+            authRepository.setRefreshToken(authResponse.getRefreshToken());
+            authRepository.setAccessToken(authResponse.getAccessToken());
+            getViewState().onResponseSuccess();
+
+        } else Log.i("Tokens", "Tokens are empty!!!!!!!!!!!");
+
+    }
 
     @Override
     public void onDestroy() {

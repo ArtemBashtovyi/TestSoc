@@ -1,4 +1,4 @@
-package com.challengesstore.data.model.registration;
+package com.challengesstore.data.model.register;
 
 
 import com.google.gson.annotations.SerializedName;
@@ -15,7 +15,7 @@ public class UserSignUp {
     private String userName;
 
     @SerializedName("check_terms")
-    private boolean checkTerms;
+    private boolean checkTerms = false;
 
     @SerializedName("email")
     private String email;
@@ -26,24 +26,24 @@ public class UserSignUp {
     private transient String passwordRepeat;
 
     public UserSignUp() {
+
     }
 
-    public UserSignUp(String name, String surname, String email, String password) {
+    public UserSignUp(String name, String surname, String userName, String email, String password) {
         this.name = name;
         this.surname = surname;
+        this.userName = userName;
         this.email = email;
         this.password = password;
-
     }
 
-    public UserSignUp(String name, String surname,String userName, String email, String password, String passwordRepeat) {
+    public UserSignUp(String name, String surname, String userName, String email, String password, String passwordRepeat) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
         this.passwordRepeat = passwordRepeat;
         this.userName = userName;
-        this.checkTerms = true;
     }
 
     public String getName() {

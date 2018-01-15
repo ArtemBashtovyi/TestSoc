@@ -3,6 +3,7 @@ package com.challengesstore.ui.login;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,8 +15,11 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.PresenterType;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.challengesstore.R;
-import com.challengesstore.data.RegisterRepository;
-import com.challengesstore.data.model.registration.UserSignIn;
+import com.challengesstore.data.model.register.UserSignIn;
+import com.challengesstore.data.prefs.PrefManager;
+import com.challengesstore.data.repository.AuthRepository;
+import com.challengesstore.data.repository.RegisterRepository;
+import com.challengesstore.ui.UserEditActivity;
 import com.challengesstore.ui.signup.SignUpActivity;
 
 import butterknife.BindView;
@@ -51,33 +55,18 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        signInBn.setOnClickListener(view ->{
-                    /*RegisterRepository registerRepository = new RegisterRepository();
-                    Call<ResponseBody> responseBodyCall  = registerRepository.welcome();
-                    responseBodyCall.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            try {
-                                Log.i("Response",response.body().string());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                        }
-                    });*/
-            presenter.onButtonSignInClick();
-        });
+        signInBn.setOnClickListener(view -> presenter.onButtonSignInClick());
 
         linkSignUpTv.setOnClickListener(view -> SignUpActivity.start(this));
     }
 
     @ProvidePresenter(type = PresenterType.LOCAL)
     LoginPresenter provideDetailPresenter() {
-        return new LoginPresenter(new RegisterRepository());
+
+        PrefManager prefManager = PrefManager.getInstance(getApplicationContext());
+        AuthRepository authRepository = new AuthRepository(prefManager);
+
+        return new LoginPresenter(new RegisterRepository(),authRepository);
     }
 
     @Override
@@ -87,6 +76,7 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
         final String email = emailEt.getText().toString();
         final String password = passwordEt.getText().toString();
 
+        // send UI data to presenter
         UserSignIn userData = new UserSignIn(email,password);
         presenter.signIn(userData);
     }
@@ -103,21 +93,16 @@ public class LoginActivity extends MvpAppCompatActivity implements LoginView {
     }
 
     @Override
-    public void onResponseError(String errorText) {
-        if (errorText != null) {
-            Toast.makeText(getBaseContext(), errorText, Toast.LENGTH_LONG).show();
-            signInBn.setEnabled(true);
-        }
+    public void onResponseError(@NonNull String errorText) {
+        Toast.makeText(getBaseContext(), errorText, Toast.LENGTH_LONG).show();
+        signInBn.setEnabled(true);
     }
 
     @Override
-    public void onResponseSuccess(String response) {
+    public void onResponseSuccess() {
         Toast.makeText(getBaseContext(), "Login success", Toast.LENGTH_LONG).show();
-
-       // MainActivity.start(this,response);
-
-        Log.i("Response",response);
+        UserEditActivity.start(this);
         signInBn.setEnabled(true);
-        //finish();
+        finish();
     }
 }
