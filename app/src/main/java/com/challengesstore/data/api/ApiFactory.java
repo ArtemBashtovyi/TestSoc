@@ -11,7 +11,6 @@ import com.challengesstore.data.api.service.UserService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -21,13 +20,10 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiFactory {
 
-    private final static String TAG_TOKEN = "ApiFactoryToken";
-
     private volatile static RegisterService registerService;
     private volatile static UserService userService;
 
     private static OkHttpClient okHttpClient;
-
 
     public static UserService getUserService(@NonNull Context context) {
         if (userService == null) {
@@ -60,18 +56,11 @@ public class ApiFactory {
     }
 
 
-    @NonNull
-    private static Retrofit.Builder createServiceBuilder() {
-        return new Retrofit.Builder()
-                .baseUrl(BuildConfig.API_ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
-    }
+
 
     @NonNull
     private static OkHttpClient createUserService(Context context) {
-        return  createBuilder()
+        return  createOkHttpBuilder()
                 .addInterceptor(new UserTokenInterceptor(context))
                 .addInterceptor(createLogInterceptor())
                 .build();
@@ -85,8 +74,8 @@ public class ApiFactory {
         if (okHttpClient == null) {
             synchronized (ApiFactory.class) {
                 if (okHttpClient == null) {
-                    okHttpClient = createBuilder()
-                            .addInterceptor(chain -> {
+                    okHttpClient = createOkHttpBuilder()
+                            /*.addInterceptor(chain -> {
                                 Request request = chain.request();
 
                                 Request.Builder builder = request.newBuilder();
@@ -94,7 +83,7 @@ public class ApiFactory {
 
                                 Request response = builder.build();
                                 return chain.proceed(response);
-                            })
+                            })*/
                             .addInterceptor(createLogInterceptor())
                             .build();
                 }
@@ -103,11 +92,21 @@ public class ApiFactory {
         return okHttpClient;
     }
 
+
     @NonNull
-    private static OkHttpClient.Builder createBuilder() {
+    private static Retrofit.Builder createServiceBuilder() {
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.API_ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
+    }
+
+    @NonNull
+    private static OkHttpClient.Builder createOkHttpBuilder() {
         return new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15,TimeUnit.SECONDS);
+                .connectTimeout(12, TimeUnit.SECONDS)
+                .readTimeout(12,TimeUnit.SECONDS);
     }
 
 
@@ -116,10 +115,6 @@ public class ApiFactory {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         return interceptor;
     }
-
-
-
-
 
 }
 

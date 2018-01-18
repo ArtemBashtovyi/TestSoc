@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.challengesstore.data.api.ApiFactory;
 import com.challengesstore.data.model.tokens.AccessToken;
 import com.challengesstore.data.model.tokens.RefreshToken;
 import com.challengesstore.data.prefs.PrefManager;
@@ -25,13 +24,21 @@ import retrofit2.Call;
 
 public class UserTokenInterceptor implements Interceptor {
 
-    private static final String TAG_TOKEN = "Interceptor" ;
+    // TODO : vars as response exceptions
+    private static final int CODE_BAD_REQUEST_RESPONSE = 400;
+    private static final int CODE_SUCCESS_RESPONSE = 202;
+
+    private static final String TAG_TOKEN = "TokenInterceptor" ;
+
+
     private Context context;
-    private ReentrantLock reentrantLock = new ReentrantLock();
-    
-    
+    private ReentrantLock lock = new ReentrantLock();
+    private AuthRepository repository;
+
     public UserTokenInterceptor(Context context) {
         this.context = context;
+        PrefManager prefManager = PrefManager.getInstance(context);
+        repository = new AuthRepository(prefManager);
     }
 
 
@@ -40,85 +47,99 @@ public class UserTokenInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        // caching logic
-        PrefManager prefManager = PrefManager.getInstance(context);
-        AuthRepository authRepository = new AuthRepository(prefManager);
-
-        String accessToken = authRepository.getAccessToken();
+        String accessToken = repository.getAccessToken();
 
         Request.Builder requestBuilder = request.newBuilder();
-        requestBuilder.addHeader("Authorization", "Bearer " + accessToken);
+        setAuthHeader(requestBuilder,accessToken);
+
+        //requestBuilder.addHeader("Authorization", "Bearer " + accessToken);
 
         Log.i(TAG_TOKEN,"FirstTime " + accessToken);
 
         request = requestBuilder.build();
-
         Response response = chain.proceed(request);
 
-        if (response.code() == 400) {
-            // double-locking check tokens
-
-            String updatedAccessToken = authRepository.getAccessToken();
-
-            synchronized (ApiFactory.class) {
-                int codeTokenRefresh = refreshAccessToken();
-                updatedAccessToken = authRepository.getAccessToken();
+        if (response.code() == CODE_BAD_REQUEST_RESPONSE) {
+            lock.lock();
+            try {
+                String updatedAccessToken = repository.getAccessToken();
 
                 if (updatedAccessToken != null
-                        && !updatedAccessToken.equals(accessToken))  {
+                        && updatedAccessToken.equals(accessToken))  {
 
-                    // 401 - error code
-                    if (codeTokenRefresh != 401) {
-
-                        if (codeTokenRefresh == 400) logout();
-                        Log.i(TAG_TOKEN,"UpdatedTokenPutting " + updatedAccessToken);
-                        // if codeTokenRefresh not error
-                        // make query with new Token
-                        Request requestNew = chain.request();
-                        requestNew = requestNew.newBuilder()
-                                .header("Authorization", "Bearer "
-                                        + updatedAccessToken).build();
-                        response = chain.proceed(requestNew);
-                        return response;
+                    // handle error updating access_token
+                    // and exceptions if updating access_token fail
+                    int codeTokenRefresh = updateAccessToken();
+                    if (codeTokenRefresh != CODE_SUCCESS_RESPONSE) {
+                        if (codeTokenRefresh == CODE_BAD_REQUEST_RESPONSE) logout();
                     }
                 }
+
+                // get exactly new token for all threads
+                // thread which execute refreshToken action will receive new token too
+                updatedAccessToken = repository.getAccessToken();
+
+                Log.i(TAG_TOKEN,"UpdatedTokenPutting " + updatedAccessToken);
+
+                Request requestNew = chain.request();
+                requestBuilder = requestNew.newBuilder();
+                setAuthHeader(requestBuilder,updatedAccessToken);
+
+                /*requestNew = requestNew.newBuilder()
+                        .header("Authorization", "Bearer "
+                                + updatedAccessToken).build();*/
+
+                // retry appropriate request
+                response = chain.proceed(requestNew);
+                return response;
+            } finally {
+                lock.unlock();
             }
+
         }
 
         return response;
     }
 
 
-    private int refreshAccessToken() {
-        int result;
-        // FIXME : THIS SHIT
-        PrefManager prefManager = PrefManager.getInstance(context);
-        AuthRepository authRepository = new AuthRepository(prefManager);
+    private void setAuthHeader(Request.Builder builder, String token) {
+        if (token != null)
+            builder.header("Authorization", String.format("Bearer %s", token));
+    }
 
-        String refreshToken = authRepository.getRefreshToken();
-        long idUser = authRepository.getId();
+    // do new call for update access_token
+    // synchronized call because all threads do async calls
+    private int updateAccessToken() {
+        int result;
+
+        // get previous refresh_token
+        String refreshToken = repository.getRefreshToken();
+        long idUser = repository.getId();
 
         try {
             Call<AccessToken> call =
-                    authRepository.updateAccessToken(new RefreshToken(idUser,refreshToken));
+                    repository.updateAccessToken(new RefreshToken(idUser,refreshToken));
 
             retrofit2.Response<AccessToken> response = call.execute();
             if (response.isSuccessful()) {
+
                 Log.i("RefreshAccessTokenFunc", response.body().getAccessToken());
-                prefManager.setAccessToken(response.body().getAccessToken());
+                repository.setAccessToken(response.body().getAccessToken());
 
                 result = response.code();
+
             } else result = response.code();
 
         } catch (IOException e) {
             e.printStackTrace();
-            result = 400;
+            result = CODE_BAD_REQUEST_RESPONSE;
         }
 
         return result;
     }
 
 
+    // TODO : logout impl
     private void logout() {
         LoginActivity.start(context);
     }
