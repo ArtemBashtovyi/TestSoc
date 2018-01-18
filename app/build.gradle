@@ -5,14 +5,14 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
-        applicationId "com.challengesstore"
+        applicationId "com.testsoc"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-
+        //Deprecated
         buildConfigField "String", "API_KEY", '"$2y$10$pn0UhyWG0lrIvv8QGQNysupcFmUB3AcO4OW95POJQxSvJSec3Yy8u"'
         buildConfigField "String", "API_ENDPOINT", '"https://challengemeserver.herokuapp.com/api/"'
 
