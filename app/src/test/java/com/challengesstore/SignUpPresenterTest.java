@@ -3,9 +3,9 @@ package com.challengesstore;
 import android.support.annotation.NonNull;
 import android.util.Patterns;
 
-import com.challengesstore.data.repository.RegisterRepository;
 import com.challengesstore.data.model.register.UserSignUp;
-import com.challengesstore.data.model.register.error.DataValidationError;
+import com.challengesstore.data.model.register.error.SignUpResponse;
+import com.challengesstore.data.repository.RegisterRepository;
 import com.challengesstore.ui.signup.SignUpPresenter;
 import com.challengesstore.ui.signup.SignUpView;
 import com.google.gson.Gson;
@@ -19,7 +19,7 @@ import org.mockito.MockitoAnnotations;
 import okhttp3.ResponseBody;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 public class SignUpPresenterTest {
 
-    private static final String NOT_VALID_RESPONSE = "{ \"errors\":{ \"username\":\"Error\", \"email\":\"email already used\" } }";
+    private static final String NOT_VALID_RESPONSE = "{ \"errors\" :{ \"first_name\" : \"Name not valid\"}}";
 
     @Mock
     SignUpView view;
@@ -56,13 +56,13 @@ public class SignUpPresenterTest {
     @Test
     public void deserializationUserSignUp_Test(){
 
-        DataValidationError error;
+        SignUpResponse error;
 
         Gson gson = new Gson();
-        error = gson.fromJson(NOT_VALID_RESPONSE,DataValidationError.class);
+        error = gson.fromJson(NOT_VALID_RESPONSE,SignUpResponse.class);
         System.out.println(error.getUserSignUp().toString());
 
-        assertTrue(error.getUserSignUp().equals(new UserSignUp(null,null,"Error","email already used",null,null)));
+        assertTrue(error.getUserSignUp().equals(new UserSignUp("Name not valid",null,null,null,null,null)));
 
     }
 
@@ -71,16 +71,12 @@ public class SignUpPresenterTest {
     @Test
     public void onSuccessResponse_Test() {
 
-        Gson gson = new Gson();
-        String json = gson.toJson(getTestUser());
-
-        when(registerRepository.signUp(json))
+        when(registerRepository.signUp(any()))
                 .thenReturn(rxRule.getSuccessObservable(getSuccessResponseBody()));
 
         presenter.signUp(getTestUser());
 
         verify(view).onResponseSuccess();
-
     }
 
     // Test error response from server
@@ -88,20 +84,18 @@ public class SignUpPresenterTest {
     public void onErrorResponse_Test() {
 
 
-
-        when(registerRepository.signUp(anyString()))
+        when(registerRepository.signUp(any()))
                 .thenReturn(rxRule.getErrorObservable(400,NOT_VALID_RESPONSE));
 
         System.out.println();
         presenter.signUp(getTestUser());
 
         verify(view).setButtonEnabled(false);
-        verify(view).showValidFieldError(new UserSignUp(null,null,"Error","email already used",null));
+        verify(view).showValidFieldError(new UserSignUp("Name not valid",null,null,null,null,null));
 
         System.out.println(NOT_VALID_RESPONSE);
 
     }
-
 
     ///////////////////////////////////////////////////////***STUBS***//////////////////////////////////////////////
 

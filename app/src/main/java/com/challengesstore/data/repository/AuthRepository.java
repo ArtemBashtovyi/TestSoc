@@ -1,10 +1,10 @@
 package com.challengesstore.data.repository;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.challengesstore.data.api.ApiFactory;
-import com.challengesstore.data.model.register.response.AccessToken;
+import com.challengesstore.data.model.tokens.AccessToken;
+import com.challengesstore.data.model.tokens.RefreshToken;
 import com.challengesstore.data.prefs.PrefManager;
 
 import retrofit2.Call;
@@ -29,6 +29,7 @@ public class AuthRepository {
         return prefManager.getRefreshToken();
     }
 
+
     public void setAccessToken(@NonNull String accessToken) {
         prefManager.setAccessToken(accessToken);
     }
@@ -37,8 +38,16 @@ public class AuthRepository {
         prefManager.setRefreshToken(refreshToken);
     }
 
-    public Call<AccessToken> updateAccessToken(String refreshToken, Context context) {
-        return ApiFactory.getUserService(context).updateAccessToken(refreshToken,19);
+    public void setId(long id){
+        prefManager.setIdUser(id);
+    }
+
+    public long getId() {
+        return prefManager.getIdUser();
+    }
+
+    public Call<AccessToken> updateAccessToken(RefreshToken refreshToken) {
+        return ApiFactory.getRegisterService().updateAccessToken(refreshToken);
     }
 
 

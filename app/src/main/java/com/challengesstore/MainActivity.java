@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         LoginActivity.start(this);
 
+       // UserEditActivity.start(this);
         //SignUpActivity.start(this);
         //finish();
 

@@ -10,8 +10,12 @@ public interface PrefContract {
 
     void setAccessToken(@NonNull String accessToken);
     void setRefreshToken(@NonNull String refreshToken);
+    void setIdUser(long id);
 
+    long getIdUser();
     String getAccessToken();
     String getRefreshToken();
+
+
 
 }

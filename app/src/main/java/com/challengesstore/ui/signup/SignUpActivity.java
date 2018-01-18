@@ -64,9 +64,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
 
         signUpBn.setOnClickListener(view -> presenter.onClick());
 
-        linkLoginTv.setOnClickListener(view -> {
-            LoginActivity.start(this);
-        });
+        linkLoginTv.setOnClickListener(view -> LoginActivity.start(this));
     }
 
 
@@ -74,9 +72,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
     public void onResponseSuccess() {
         Toast.makeText(getBaseContext(), "Login success", Toast.LENGTH_LONG).show();
         signUpBn.setEnabled(true);
-
-        /*LoginActivity.start(this);
-        finish();*/
+        LoginActivity.start(this);
+        finish();
     }
 
     @Override
@@ -102,13 +99,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
         Log.i(TAG,userData.toString());
     }
 
-
-
-    // show error in each EditText if improperly data introduced
-    /*@Override
-    public void showValidFieldError(@Nullable String name, @Nullable String surname,
-                                    @Nullable String email, @Nullable String password,
-                                    @Nullable  String passwordRepeat){*/
 
     @Override
     public void showValidFieldError(UserSignUp userData) {

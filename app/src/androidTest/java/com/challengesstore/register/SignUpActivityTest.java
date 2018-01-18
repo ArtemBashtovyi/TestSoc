@@ -41,8 +41,8 @@ public class SignUpActivityTest {
         onView(withId(R.id.input_surname)).perform(ViewActions.typeText("Bash"), closeSoftKeyboard());
         onView(withId(R.id.input_user_name)).perform(ViewActions.typeText("ArtemQQ"), closeSoftKeyboard());
         onView(withId(R.id.input_email)).perform(ViewActions.typeText("artem@gmail.com"), closeSoftKeyboard());
-        onView(withId(R.id.input_password)).perform(ViewActions.typeText("pass"), closeSoftKeyboard());
-        onView(withId(R.id.input_password_repeat)).perform(ViewActions.typeText("pass"), closeSoftKeyboard());
+        onView(withId(R.id.input_password)).perform(ViewActions.typeText("pass1"), closeSoftKeyboard());
+        onView(withId(R.id.input_password_repeat)).perform(ViewActions.typeText("pass1"), closeSoftKeyboard());
 
     }
 
@@ -57,8 +57,8 @@ public class SignUpActivityTest {
         onView(withId(R.id.input_surname)).check(matches(withText("Bash")));
         onView(withId(R.id.input_user_name)).check(matches(withText("ArtemQQ")));
         onView(withId(R.id.input_email)).check(matches(withText("artem@gmail.com")));
-        onView(withId(R.id.input_password)).check(matches(withText("pass")));
-        onView(withId(R.id.input_password_repeat)).check(matches(withText("pass")));
+        onView(withId(R.id.input_password)).check(matches(withText("pass1234")));
+        onView(withId(R.id.input_password_repeat)).check(matches(withText("pass1234")));
 
         onView(withId(R.id.btn_signup)).perform(click());
 
@@ -86,6 +86,22 @@ public class SignUpActivityTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    @Test
+    public void fillingFormUnCorrectly_For_Server() {
+
+        onView(withId(R.id.signup_scroll_view)).perform(swipeUp());
+        onView(withId(R.id.btn_signup)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

@@ -6,22 +6,22 @@ import com.google.gson.annotations.SerializedName;
 public class UserSignUp {
 
     @SerializedName("first_name")
-    private String name;
+    private String name = null;
 
     @SerializedName("last_name")
-    private String surname;
+    private String surname = null;
 
     @SerializedName("username")
-    private String userName;
+    private String userName = null;
 
     @SerializedName("check_terms")
-    private boolean checkTerms = false;
+    private boolean checkTerms = true;
 
     @SerializedName("email")
-    private String email;
+    private String email = null;
 
     @SerializedName("plainPassword")
-    private String password;
+    private String password = null;
 
     private transient String passwordRepeat;
 

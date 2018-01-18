@@ -50,14 +50,76 @@ public class UserEditActivity extends Activity {
         if (button != null) {
             button.setOnClickListener(view -> {
 
-                Call<ResponseBody> call = ApiFactory.getUserService(getApplicationContext()).welcome();
-                try {
-                    Response<ResponseBody> responseBody = call.execute();
-                    Log.i("Call in activity",responseBody.body().string());
+                /*PrefManager prefManager = PrefManager.getInstance(getApplicationContext());
+                AuthRepository authRepository = new AuthRepository(prefManager);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                long id = authRepository.getId();
+
+                Log.i("idLong",id + " ");
+
+                Call<ResponseBody> call = ApiFactory.getUserService(getApplicationContext()).getUser(id);
+
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+
+                                try {
+                                    Log.i("Call in activity", response.body().string());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else { Log.i("Exception","aaaa");}
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                        }
+                    });*/
+
+
+                Call<ResponseBody> call = ApiFactory.getUserService(getApplicationContext()).welcome();
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                        if(response.isSuccessful()) {
+                            try {
+                                Log.i("Response",response.body().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else Log.i("Error","Auth");
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+
+
+                Call<ResponseBody> call2 = ApiFactory.getUserService(getApplicationContext()).welcome();
+                call2.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                        if(response.isSuccessful()) {
+                            try {
+                                Log.i("Response2",response.body().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else Log.i("Error2","Auth");
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+
                 /*Intent intent = new Intent(this,);
                 intent.setType("image*//**//*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -100,7 +162,7 @@ public class UserEditActivity extends Activity {
             RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "Art");
             RequestBody lastName = RequestBody.create(MediaType.parse("text/plain"), "Art");
 
-            Log.d("THIS", data.getData().getPath());
+            Log.d("File", data.getData().getPath());
 
             UserService registerService = ApiFactory.getUserService(getApplicationContext());
             Call<ResponseBody> req = registerService.postImage(body, name,lastName);

@@ -5,10 +5,9 @@ import android.util.Log;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.challengesstore.data.model.register.UserSignIn;
-import com.challengesstore.data.model.register.response.AuthResponse;
+import com.challengesstore.data.model.tokens.AuthResponse;
 import com.challengesstore.data.repository.AuthRepository;
 import com.challengesstore.data.repository.RegisterRepository;
-import com.google.gson.Gson;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -35,7 +34,7 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
         getViewState().signIn();
     }
 
-    public void signIn(final UserSignIn userData) {
+    public void signIn(UserSignIn userData) {
 
         if (!isUserDataValid(userData)) {
             getViewState().setButtonEnabled(true);
@@ -46,14 +45,12 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
         getViewState().setButtonEnabled(false);
     }
 
-    public void sendUserData(UserSignIn user) {
+    private void sendUserData(UserSignIn user) {
         // clear previous observables if not first time click
         disposable.clear();
 
-        final String json = new Gson().toJson(user);
-
         disposable.add(repository
-                .signIn(json)
+                .signIn(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseBody -> {
@@ -63,9 +60,9 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
                     }
 
                     onResponseSuccess(responseBody.body());
-                    Log.i("ResponseFull", responseBody.body().getAccessToken());
+                   // Log.i("ResponseFull", responseBody.body().getAccessToken());
 
-                }, e -> getViewState().onResponseError("Error internet connection")));
+                }, e -> getViewState().onResponseError(e.toString())));
     }
 
 
@@ -86,7 +83,7 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
         }
 
         if (userData.getPassword().isEmpty() || userData.getPassword().length() < 4
-                || userData.getPassword().length() > 10) {
+                || userData.getPassword().length() > 30) {
             password = "between 4 and 10 alphanumeric characters";
             isValid = false;
         }
@@ -98,10 +95,13 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
 
     private void onResponseSuccess(AuthResponse authResponse) {
 
-        if (!authResponse.getAccessToken().isEmpty() && !authResponse.getRefreshToken().isEmpty()) {
+        if (!authResponse.getAccessToken().isEmpty()
+                && !authResponse.getRefreshToken().isEmpty()
+                && authResponse.getId() > 0) {
 
-            Log.i("Tokens","Tokens are successfully created");
+           // Log.i("Tokens","Tokens are successfully created");
 
+            authRepository.setId(authResponse.getId());
             authRepository.setRefreshToken(authResponse.getRefreshToken());
             authRepository.setAccessToken(authResponse.getAccessToken());
             getViewState().onResponseSuccess();

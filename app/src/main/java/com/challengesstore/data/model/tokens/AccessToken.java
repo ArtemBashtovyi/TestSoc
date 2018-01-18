@@ -1,4 +1,4 @@
-package com.challengesstore.data.model.register.response;
+package com.challengesstore.data.model.tokens;
 
 import android.support.annotation.NonNull;
 
@@ -10,16 +10,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class AccessToken {
 
-    @SerializedName("access_token")
+    @SerializedName("token")
     @NonNull
     private String accessToken;
 
-    @SerializedName("token_type")
-    private String tokenType;
+    /*@SerializedName("token_type")
+    private String tokenType;*/
 
-    public AccessToken(@NonNull String accessToken, String tokenType) {
+    public AccessToken(@NonNull String accessToken,@NonNull String tokenType) {
         this.accessToken = accessToken;
-        this.tokenType = tokenType;
+        //this.tokenType = "SAs";
     }
 
     public String getAccessToken() {
@@ -30,11 +30,11 @@ public class AccessToken {
         this.accessToken = accessToken;
     }
 
-    public String getTokenType() {
+  /*  public String getTokenType() {
         return tokenType;
     }
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
-    }
+    }*/
 }

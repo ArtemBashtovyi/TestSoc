@@ -7,13 +7,14 @@ import com.google.gson.annotations.SerializedName;
  * Created by felix on 1/14/18
  */
 
-public class DataValidationError {
+public class SignUpResponse {
 
     @SerializedName("errors")
     private UserSignUp userSignUp;
 
-    public DataValidationError(UserSignUp userSignUp) {
+    public SignUpResponse(UserSignUp userSignUp) {
         this.userSignUp = userSignUp;
+
     }
 
     public UserSignUp getUserSignUp() {

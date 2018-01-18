@@ -1,10 +1,9 @@
 package com.challengesstore.ui.signup;
 
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import com.challengesstore.data.model.register.UserSignUp;
-import com.challengesstore.data.model.register.error.DataValidationError;
+import com.challengesstore.data.model.register.error.SignUpResponse;
 import com.challengesstore.data.repository.RegisterRepository;
 import com.google.gson.Gson;
 
@@ -52,22 +51,20 @@ public class SignUpPresenter {
     // send POST to server
 
     private void sendUserData(UserSignUp user) {
-        final String json = new Gson().toJson(user);
-
         disposable.clear();
 
         disposable.add(repository
-                .signUp(json)
+                .signUp(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (!response.isSuccessful()) {
-
                         onResponseError(response.code(),response.errorBody().string());
                         return;
                     }
+
                     view.onResponseSuccess();
-                    Log.i("Response ", String.valueOf(response.body().string()));
+                    //Log.i("ResponseSuccess ", String.valueOf(response.body().string()));
                         } ,e -> view.onResponseError("Error internet connection")
                 )
         );
@@ -121,24 +118,24 @@ public class SignUpPresenter {
     }
 
 
-     private void onResponseError(int code,@Nullable String errorJson){
-        if (errorJson != null) {
-            if (code == ERROR_BAD_REQUEST_CODE) {
-                try {
-                    UserSignUp invalidFields = new Gson()
-                            .fromJson(errorJson, DataValidationError.class)
-                            .getUserSignUp();
+     // parse certain error from server
+     private void onResponseError(int code, @NonNull String errorBody ){
 
-                    view.showValidFieldError(invalidFields);
+         if (code == ERROR_BAD_REQUEST_CODE) {
+             try {
 
-                } catch (Exception e) {
-                    view.onResponseError("Input data invalid");
-                }
+                 UserSignUp response = new Gson()
+                         .fromJson(errorBody,SignUpResponse.class)
+                         .getUserSignUp();
 
-            } else {
-                view.onResponseError("Unknown error");
-            }
-        } else view.onResponseError("Error");
+                 view.showValidFieldError(response);
+             } catch (Exception e) {
+                 e.printStackTrace();
+                 view.onResponseError("Input data invalid");
+             }
+         } else {
+             view.onResponseError("Unknown error");
+         }
     }
 
     void onDestroy() {

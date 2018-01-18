@@ -12,8 +12,8 @@ public class PrefManager implements PrefContract {
 
     private static final String AUTH_DATA = "auth_data";
     private static final String KEY_ACCESS_TOKEN = "access_token";
-    private static final String KEY_REFRESH_TOKEN = "access_token";
-
+    private static final String KEY_REFRESH_TOKEN = "refresh_token";
+    private static final String KEY_ID_USER = "id_user";
 
     private static PrefManager INSTANCE;
 
@@ -44,6 +44,16 @@ public class PrefManager implements PrefContract {
     }
 
     @Override
+    public void setIdUser(long id) {
+        getSharedPreferences(AUTH_DATA).edit().putLong(KEY_ID_USER,id).apply();
+    }
+
+    @Override
+    public long getIdUser() {
+        return getSharedPreferences(AUTH_DATA).getLong(KEY_ID_USER,1);
+    }
+
+    @Override
     public String getAccessToken() {
         return getSharedPreferences(AUTH_DATA).getString(KEY_ACCESS_TOKEN,"");
     }
@@ -52,4 +62,6 @@ public class PrefManager implements PrefContract {
     public String getRefreshToken() {
         return getSharedPreferences(AUTH_DATA).getString(KEY_REFRESH_TOKEN,"");
     }
+
+
 }
