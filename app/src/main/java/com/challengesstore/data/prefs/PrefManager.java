@@ -15,6 +15,7 @@ public class PrefManager implements PrefContract {
     private static final String KEY_REFRESH_TOKEN = "refresh_token";
     private static final String KEY_ID_USER = "id_user";
 
+    // FIXME : rewrite singleton
     private static PrefManager INSTANCE;
 
     private Context context;

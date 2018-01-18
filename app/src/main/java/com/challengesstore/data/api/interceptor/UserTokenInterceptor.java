@@ -50,9 +50,9 @@ public class UserTokenInterceptor implements Interceptor {
         String accessToken = repository.getAccessToken();
 
         Request.Builder requestBuilder = request.newBuilder();
-        setAuthHeader(requestBuilder,accessToken);
+       // setAuthHeader(requestBuilder,accessToken);
 
-        //requestBuilder.addHeader("Authorization", "Bearer " + accessToken);
+        requestBuilder.addHeader("Authorization", "Bearer " + accessToken);
 
         Log.i(TAG_TOKEN,"FirstTime " + accessToken);
 
@@ -82,12 +82,9 @@ public class UserTokenInterceptor implements Interceptor {
                 Log.i(TAG_TOKEN,"UpdatedTokenPutting " + updatedAccessToken);
 
                 Request requestNew = chain.request();
-                requestBuilder = requestNew.newBuilder();
-                setAuthHeader(requestBuilder,updatedAccessToken);
-
-                /*requestNew = requestNew.newBuilder()
+                requestNew = requestNew.newBuilder()
                         .header("Authorization", "Bearer "
-                                + updatedAccessToken).build();*/
+                                + updatedAccessToken).build();
 
                 // retry appropriate request
                 response = chain.proceed(requestNew);
@@ -101,11 +98,6 @@ public class UserTokenInterceptor implements Interceptor {
         return response;
     }
 
-
-    private void setAuthHeader(Request.Builder builder, String token) {
-        if (token != null)
-            builder.header("Authorization", String.format("Bearer %s", token));
-    }
 
     // do new call for update access_token
     // synchronized call because all threads do async calls

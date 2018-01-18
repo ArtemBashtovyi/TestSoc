@@ -23,20 +23,18 @@ public class ApiFactory {
     private volatile static RegisterService registerService;
     private volatile static UserService userService;
 
-    private static OkHttpClient okHttpClient;
 
     public static UserService getUserService(@NonNull Context context) {
         if (userService == null) {
             synchronized (ApiFactory.class) {
                 if (userService == null) {
                     userService = createServiceBuilder()
-                            .client(createUserService(context))
+                            .client(createUserServiceClient(context))
                             .build()
                             .create(UserService.class);
                 }
             }
         }
-
         return userService;
     }
 
@@ -56,40 +54,18 @@ public class ApiFactory {
     }
 
 
-
-
     @NonNull
-    private static OkHttpClient createUserService(Context context) {
+    private static OkHttpClient createUserServiceClient(Context context) {
         return  createOkHttpBuilder()
                 .addInterceptor(new UserTokenInterceptor(context))
-                .addInterceptor(createLogInterceptor())
                 .build();
-
     }
 
 
-
-    // Двойная проверка
+    @NonNull
     private static OkHttpClient createRegisterClient() {
-        if (okHttpClient == null) {
-            synchronized (ApiFactory.class) {
-                if (okHttpClient == null) {
-                    okHttpClient = createOkHttpBuilder()
-                            /*.addInterceptor(chain -> {
-                                Request request = chain.request();
-
-                                Request.Builder builder = request.newBuilder();
-                                builder.addHeader("Content-Type","application/json");
-
-                                Request response = builder.build();
-                                return chain.proceed(response);
-                            })*/
-                            .addInterceptor(createLogInterceptor())
-                            .build();
-                }
-            }
-        }
-        return okHttpClient;
+        return createOkHttpBuilder()
+                .build();
     }
 
 
@@ -105,8 +81,9 @@ public class ApiFactory {
     @NonNull
     private static OkHttpClient.Builder createOkHttpBuilder() {
         return new OkHttpClient.Builder()
-                .connectTimeout(12, TimeUnit.SECONDS)
-                .readTimeout(12,TimeUnit.SECONDS);
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15,TimeUnit.SECONDS)
+                .addInterceptor(createLogInterceptor());
     }
 
 

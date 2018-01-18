@@ -23,6 +23,7 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
     private CompositeDisposable disposable = new CompositeDisposable();
 
     public LoginPresenter() {
+
     }
 
     public LoginPresenter(RegisterRepository repository,AuthRepository authRepository) {
@@ -68,10 +69,10 @@ public class LoginPresenter extends MvpPresenter<LoginView> {
 
 
     public void setError(int code) {
-        // TODO : HANDLE ERROR CODE
+        // TODO : HANDLE BAD RESPONSE
     }
 
-    public boolean isUserDataValid(UserSignIn userData) {
+    private boolean isUserDataValid(UserSignIn userData) {
         boolean isValid = true;
         String email = null;
         String password = null;

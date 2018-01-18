@@ -14,12 +14,8 @@ public class AccessToken {
     @NonNull
     private String accessToken;
 
-    /*@SerializedName("token_type")
-    private String tokenType;*/
-
-    public AccessToken(@NonNull String accessToken,@NonNull String tokenType) {
+    public AccessToken(@NonNull String accessToken) {
         this.accessToken = accessToken;
-        //this.tokenType = "SAs";
     }
 
     public String getAccessToken() {
@@ -30,11 +26,4 @@ public class AccessToken {
         this.accessToken = accessToken;
     }
 
-  /*  public String getTokenType() {
-        return tokenType;
-    }
-
-    public void setTokenType(String tokenType) {
-        this.tokenType = tokenType;
-    }*/
 }

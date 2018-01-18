@@ -36,7 +36,6 @@ public class SignUpPresenter {
     // main method which start sequence
     public void signUp(UserSignUp userData) {
 
-        // check data validation
         if (!isUserDataValid(userData)) {
             view.setButtonEnabled(true);
             return;
@@ -47,8 +46,6 @@ public class SignUpPresenter {
         sendUserData(userData);
     }
 
-
-    // send POST to server
 
     private void sendUserData(UserSignUp user) {
         disposable.clear();
@@ -70,7 +67,7 @@ public class SignUpPresenter {
         );
     }
 
-    // logic to verify is user input data valid
+    // logic to verify  user input data
     private boolean isUserDataValid(UserSignUp user) {
 
         boolean isValid = true;
@@ -120,7 +117,6 @@ public class SignUpPresenter {
 
      // parse certain error from server
      private void onResponseError(int code, @NonNull String errorBody ){
-
          if (code == ERROR_BAD_REQUEST_CODE) {
              try {
 
